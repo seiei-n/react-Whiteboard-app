@@ -22,7 +22,7 @@ export const Board = () => {
         <>
             <h1>Jam Board</h1>
             <h2>Room: {slug}</h2>
-            < Canvas canvasWidth={500} canvasHeight={500} />
+            < Canvas width={500} height={500} username={username || ""} />
         </>
     );
 };
