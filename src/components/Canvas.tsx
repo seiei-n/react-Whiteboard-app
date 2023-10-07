@@ -62,14 +62,7 @@ export const Canvas = ({ canvasWidth, canvasHeight }: CanvasProps) => {
         ws.addEventListener("error", handleWebSocketError);
 
         return () => {
-            canvas.removeEventListener("mousedown", handleMouseDown);
-            canvas.removeEventListener("mousemove", handleMouseMove);
-            canvas.removeEventListener("mouseup", handleMouseUp);
-            canvas.removeEventListener("mouseout", handleMouseOut);
-            ws.removeEventListener("open", handleWebSocketOpen);
-            ws.removeEventListener("message", handleWebSocketMessage);
-            ws.removeEventListener("close", handleWebSocketClose);
-            ws.removeEventListener("error", handleWebSocketError);
+
         };
     }, []);
 
@@ -161,6 +154,7 @@ export const Canvas = ({ canvasWidth, canvasHeight }: CanvasProps) => {
 
     const draw = (data: { type: string; x: number; y: number }) => {
         // drawing from local data
+        console.log(data);
         if (data.type === "end") {
             setClickFlag(false);
             setLastX(null);
@@ -227,6 +221,13 @@ export const Canvas = ({ canvasWidth, canvasHeight }: CanvasProps) => {
         setCanvasBgColor(canvasBgColor);
     };
 
+    const handleClearButtonClick = () => {
+        // Clear button click event
+        if (!currentWebSocket) return;
+        clearCanvas();
+        currentWebSocket.send(JSON.stringify({ type: "clear" }));
+    }
+
     const handleMouseDown = (event: MouseEvent) => {
         // Mouse down event
         if (!ctx) return;
@@ -238,6 +239,37 @@ export const Canvas = ({ canvasWidth, canvasHeight }: CanvasProps) => {
         draw({ type: "start", x: x, y: y });
     };
 
+    const handleMouseMove = (event: MouseEvent) => {
+        // Mouse move event
+        console.log(clickFlag);
+        if (!clickFlag) return;
+        const x = event.offsetX;
+        const y = event.offsetY;
+        draw({ type: "move", x: x, y: y });
+    }
+
+    const handleMouseUp = (event: MouseEvent) => {
+        // Mouse up event
+        if (!clickFlag) return;
+        const x = event.offsetX;
+        const y = event.offsetY;
+        draw({ type: "end", x: x, y: y });
+        if (!currentWebSocket) return;
+        currentWebSocket.send(JSON.stringify({ type: "end", x: x, y: y }));
+    }
+
+    const handleMouseOut = (event: MouseEvent) => {
+        // Mouse out event
+        if (!clickFlag) return;
+        const x = event.offsetX;
+        const y = event.offsetY;
+        draw({ type: "end", x: x, y: y });
+        if (!currentWebSocket) return;
+        currentWebSocket.send(JSON.stringify({ type: "end", x: x, y: y }));
+    }
+
+
+
     return (
         <>
             <div>
@@ -247,6 +279,7 @@ export const Canvas = ({ canvasWidth, canvasHeight }: CanvasProps) => {
                     height="500"
                     style={{ border: "1px solid black" }}
                 ></canvas>
+                <br />
                 <button id="clear_button" onClick={handleClearButtonClick}>
                     Clear
                 </button>

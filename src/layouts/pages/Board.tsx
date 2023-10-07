@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
+import Canvas from "../../components/Canvas";
 
 export const Board = () => {
     const { slug } = useParams();
@@ -21,7 +22,7 @@ export const Board = () => {
         <>
             <h1>Jam Board</h1>
             <h2>Room: {slug}</h2>
-            <canvas id="canvas" width="800" height="600"></canvas>
+            < Canvas canvasWidth={500} canvasHeight={500} />
         </>
     );
 };
